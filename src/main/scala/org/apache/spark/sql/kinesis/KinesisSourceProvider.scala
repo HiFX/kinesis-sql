@@ -24,6 +24,7 @@ import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.execution.streaming.Source
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
+import com.amazonaws.auth.{AWSCredentialsProvider, InstanceProfileCredentialsProvider}
 
  /*
   * The provider class for the [[KinesisSource]]. This provider is designed such that it throws
@@ -77,6 +78,8 @@ private[kinesis] class KinesisSourceProvider extends DataSourceRegister
 
     val awsAccessKeyId = caseInsensitiveParams.get(AWS_ACCESS_KEY_ID).getOrElse("")
     val awsSecretKey = caseInsensitiveParams.get(AWS_SECRET_KEY).getOrElse("")
+    val awsStsRoleArn = caseInsensitiveParams.get(AWS_STS_ROLE_ARN).getOrElse("")
+    val awsStsSessionName = caseInsensitiveParams.get(AWS_STS_SESS_NAME).getOrElse("")
 
     val regionName = caseInsensitiveParams.get(REGION_NAME_KEY)
       .getOrElse(DEFAULT_KINESIS_REGION_NAME)
@@ -85,7 +88,15 @@ private[kinesis] class KinesisSourceProvider extends DataSourceRegister
 
     val initialPosition: KinesisPosition = getKinesisPosition(caseInsensitiveParams)
 
-    val kinesisCredsProvider: BasicCredentials = BasicCredentials(awsAccessKeyId, awsSecretKey)
+//    val kinesisCredsProvider: BasicCredentials = BasicCredentials(awsAccessKeyId, awsSecretKey)
+
+    val kinesisCredsProvider = if (awsAccessKeyId.length > 0) {
+      BasicCredentials(awsAccessKeyId, awsSecretKey)
+    } else if (awsStsRoleArn.length > 0) {
+      STSCredentials(awsStsRoleArn, awsStsSessionName)
+    } else {
+      InstanceProfileCredentials()
+    }
 
     new KinesisSource(
       sqlContext, specifiedKinesisParams, metadataPath,
@@ -109,6 +120,8 @@ private[kinesis] object KinesisSourceProvider extends Logging {
   private[kinesis] val REGION_NAME_KEY = "regionname"
   private[kinesis] val AWS_ACCESS_KEY_ID = "awsaccesskeyid"
   private[kinesis] val AWS_SECRET_KEY = "awssecretkey"
+  private[kinesis] val AWS_STS_ROLE_ARN = "awsstsrolearn"
+  private[kinesis] val AWS_STS_SESS_NAME = "awsstssessname"
   private[kinesis] val STARTING_POSITION_KEY = "startingposition"
 
   private[kinesis] def getKinesisPosition(
