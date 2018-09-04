@@ -216,7 +216,9 @@ private[kinesis] class KinesisSourceRDD(
           if (lastSeenTimeStamp > 0) {
             new ShardInfo(
               sourcePartition.shardInfo.shardId,
-              new AtTimeStamp(lastSeenTimeStamp))
+//              new AtTimeStamp(lastSeenTimeStamp))
+//              new AtTimeStamp(System.currentTimeMillis() - (9L * 60L * 1000L)))
+              new Latest())
           } else {
             logWarning("Neither LastSequenceNumber nor LastTimeStamp was recorded.")
             sourcePartition.shardInfo
