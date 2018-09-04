@@ -17,14 +17,17 @@
 
 package org.apache.spark.sql.kinesis
 
+
 import java.util.Locale
+
+import com.amazonaws.auth.{AWSCredentialsProvider, InstanceProfileCredentialsProvider}
 
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.sql.execution.streaming.Source
 import org.apache.spark.sql.sources._
 import org.apache.spark.sql.types.StructType
-import com.amazonaws.auth.{AWSCredentialsProvider, InstanceProfileCredentialsProvider}
+
 
  /*
   * The provider class for the [[KinesisSource]]. This provider is designed such that it throws

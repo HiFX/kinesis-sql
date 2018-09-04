@@ -39,9 +39,9 @@ private[kinesis] final case object DefaultCredentials extends SparkAWSCredential
   def provider: AWSCredentialsProvider = new DefaultAWSCredentialsProviderChain
 }
 
-/**
-  * Returns InstanceProfileCredentialsProvider.
-  */
+  /**
+   * Returns InstanceProfileCredentialsProvider.
+   */
 private[kinesis] final case class InstanceProfileCredentials()
   extends SparkAWSCredentials with Logging {
 
@@ -123,10 +123,9 @@ object SparkAWSCredentials {
     }
 
     /**
-      * Use a instance profile credentials.
-      *
-      * @return Reference to this [[SparkAWSCredentials.Builder]]
-      */
+     * Use a instance profile credentials.
+     * @return Reference to this [[SparkAWSCredentials.Builder]]
+     */
     // scalastyle:on
     def instanceProfileCredentials(): Builder = {
       instanceCreds = Option(InstanceProfileCredentials())
