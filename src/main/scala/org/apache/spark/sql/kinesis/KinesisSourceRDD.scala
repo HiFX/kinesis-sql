@@ -208,9 +208,14 @@ private[kinesis] class KinesisSourceRDD(
             new ShardEnd())
         }
         else if (!lastReadSequenceNumber.isEmpty) {
-          new ShardInfo(
-            sourcePartition.shardInfo.shardId,
-            new AfterSequenceNumber(lastReadSequenceNumber))
+          if (lastSeenTimeStamp < System.currentTimeMillis()-(9 * 60 * 1000)) {
+              new ShardInfo(sourcePartition.shardInfo.shardId,
+                new Latest())
+          } else {
+            new ShardInfo(
+              sourcePartition.shardInfo.shardId,
+              new AfterSequenceNumber(lastReadSequenceNumber))
+          }
         }
         else {
           if (lastSeenTimeStamp > 0) {
