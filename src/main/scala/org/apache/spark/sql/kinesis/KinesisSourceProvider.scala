@@ -133,7 +133,8 @@ private[kinesis] object KinesisSourceProvider extends Logging {
     val CURRENT_TIMESTAMP = System.currentTimeMillis
     params.get(STARTING_POSITION_KEY).map(_.trim) match {
       case Some(position) if position.toLowerCase(Locale.ROOT) == "latest" =>
-        new AtTimeStamp(CURRENT_TIMESTAMP)
+//        new AtTimeStamp(CURRENT_TIMESTAMP)
+        new  Latest()
       case Some(position) if position.toLowerCase(Locale.ROOT) == "trim_horizon" =>
         new TrimHorizon
       case None => new AtTimeStamp(CURRENT_TIMESTAMP)
